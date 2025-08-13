@@ -1,0 +1,664 @@
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dana Tabungan dengan Login & Transfer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: #fef2f2;
+      color: #333;
+      padding-bottom: 100px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .header {
+      background: linear-gradient(90deg, #ef4444, #dc2626);
+      color: white;
+      padding: 25px 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      max-width: 450px;
+      margin-bottom: 20px;
+      user-select: none;
+    }
+    .saran {
+      background: #fff0f0;
+      color: #b91c1c;
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      animation: fadeSaran 1s ease;
+      border-bottom: 1px solid #f3bcbc;
+      width: 100%;
+      max-width: 450px;
+      margin-bottom: 10px;
+    }
+    @keyframes fadeSaran {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+    .card-saldo {
+      background: white;
+      margin: 0 auto 20px auto;
+      padding: 20px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 450px;
+      box-shadow: 0 6px 18px rgba(220, 38, 38, 0.15);
+    }
+    .card-saldo h2 {
+      margin: 0;
+      font-size: 14px;
+      color: #888;
+    }
+    .saldo-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .saldo {
+      font-size: 22px;
+      font-weight: 600;
+      color: #555;
+    }
+    .eye-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      margin-left: 4px;
+      display: flex;
+      align-items: center;
+      opacity: 0.6;
+      transition: opacity 0.2s ease;
+    }
+    .eye-btn:hover {
+      opacity: 1;
+    }
+    .eye-btn img {
+      width: 16px;
+      height: 16px;
+      filter: grayscale(1) brightness(0.5);
+    }
+    .main {
+      width: 90%;
+      max-width: 450px;
+      margin: 0 auto 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.12);
+      user-select: none;
+    }
+    input[type="number"], input[type="password"], input[type="text"] {
+      padding: 12px;
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      margin-bottom: 15px;
+      outline-color: #dc2626;
+      user-select: text;
+    }
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+    button {
+      background-color: #dc2626;
+      color: white;
+      padding: 12px;
+      flex: 1;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+      user-select: none;
+    }
+    button:hover:not(:disabled) {
+      background-color: #b91c1c;
+      transform: translateY(-1px);
+    }
+    button:disabled {
+      background-color: #f0a6a6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .history {
+      margin-top: 25px;
+    }
+    .history-list {
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 10px;
+      border-radius: 10px;
+      background: #fffafa;
+      border: 1px solid #fcdcdc;
+    }
+    .history-item {
+      padding: 8px 0;
+      border-bottom: 1px solid #f3bcbc;
+      font-size: 15px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .history-item.negative span:first-child {
+      color: #b91c1c;
+    }
+    .hapus-btn {
+      margin-top: 12px;
+      background-color: #991b1b;
+    }
+    .fitur-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: white;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.07);
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      z-index: 10;
+      user-select: none;
+    }
+    .fitur {
+      text-align: center;
+      font-size: 13px;
+      color: #333;
+      transition: transform 0.2s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+    .fitur:hover {
+      transform: scale(1.1);
+    }
+    .fitur img {
+      width: 28px;
+      height: 28px;
+      margin-bottom: 4px;
+    }
+    /* Toast style */
+    #toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #dc2626;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
+      user-select: none;
+    }
+    /* Modal overlay */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right:0; bottom: 0;
+      background: rgba(0,0,0,0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    .modal {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      max-height: 90vh;
+      overflow-y: auto;
+      user-select: none;
+    }
+    .modal h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      color: #dc2626;
+      user-select: text;
+    }
+    .modal input {
+      margin-bottom: 15px;
+    }
+    .modal button {
+      margin-top: 10px;
+    }
+    .modal .close-btn {
+      background: #999;
+      margin-top: 5px;
+    }
+    .modal .info-text {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 12px;
+    }
+    .modal .transfer-list {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #f3bcbc;
+      border-radius: 10px;
+      background: #fffafa;
+      padding: 10px;
+    }
+    .modal .transfer-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 14px;
+      border-bottom: 1px solid #fcdcdc;
+      padding-bottom: 4px;
+    }
+    .modal .transfer-item:last-child {
+      border-bottom: none;
+    }
+    .modal .transfer-item span {
+      user-select: text;
+    }
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Login Screen -->
+  <div id="loginScreen" style="width: 100%; max-width: 450px; margin-top: 50px;">
+    <div class="card-saldo" style="text-align:center;">
+      <h2>Masuk ke Dana Tabungan</h2>
+  <input type="text" id="loginUsername" placeholder="Masukkan username" autocomplete="username" />
+  <input type="password" id="loginPassword" placeholder="Masukkan password" autocomplete="current-password" />
+      <button id="btnLogin">Login</button>
+      <button id="btnRegister" style="margin-top: 8px; background-color:#b91c1c;">Buat Akun Baru</button>
+      <div id="loginMsg" style="color:#b91c1c; margin-top: 10px; font-size: 14px;"></div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <div id="app" class="hidden" style="width: 100%; max-width: 450px;">
+    <div class="header">DANA TABUNGAN</div>
+    <div class="saran" id="saranText">Gunakan dana ini dengan bijak 💡</div>
+
+    <div class="card-saldo">
+      <h2>Saldo</h2>
+      <div class="saldo-container">
+        <div class="saldo" id="saldoText">Rp0</div>
+        <button class="eye-btn" onclick="toggleSaldo()" id="eyeBtn" aria-label="Tampilkan/ sembunyikan saldo">
+          <img src="https://img.icons8.com/ios-glyphs/30/000000/visible--v1.png" id="eyeIcon" />
+        </button>
+      </div>
+    </div>
+
+    <div class="main">
+      <h3>Kelola Saldo</h3>
+      <input type="number" id="amountInput" placeholder="Masukkan nominal..." />
+      <div class="btn-group">
+        <button onclick="tambahSaldo()">Tambah</button>
+        <button onclick="kurangiSaldo()">Kurangi</button>
+      </div>
+
+      <div class="history">
+        <h4>Riwayat Transaksi</h4>
+        <div class="history-list" id="historyList">
+          <div style="color: #999;">Belum ada transaksi</div>
+        </div>
+        <button class="hapus-btn" onclick="hapusRiwayat()">Hapus Riwayat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Kirim Saldo -->
+  <div id="modalKirim" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalKirimTitle">
+    <div class="modal">
+      <h3 id="modalKirimTitle">Kirim Saldo ke Akun Lain</h3>
+      <input type="text" id="kirimUsername" placeholder="Masukkan password akun tujuan" autocomplete="off" />
+      <input type="number" id="kirimAmount" placeholder="Nominal yang akan dikirim" min="1" />
+      <button id="btnKirimSaldo">Kirim</button>
+      <button class="close-btn" onclick="closeModal('modalKirim')">Batal</button>
+      <div id="kirimMsg" style="color:#b91c1c; margin-top: 10px; font-size: 14px;"></div>
+      <div style="font-size:12px; color:#555; margin-top:10px;">
+        * Masukkan password akun tujuan. Jika tidak ada akun dengan password tersebut, transfer akan gagal.
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Terima Saldo -->
+  <div id="modalTerima" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalTerimaTitle">
+    <div class="modal">
+      <h3 id="modalTerimaTitle">Saldo Masuk yang Belum Diterima</h3>
+      <div id="listSaldoMasuk" class="transfer-list">
+        <!-- List saldo masuk muncul di sini -->
+      </div>
+      <button class="close-btn" onclick="closeModal('modalTerima')">Tutup</button>
+    </div>
+  </div>
+
+  <!-- Fitur footer -->
+  <div class="fitur-footer">
+    <div class="fitur" onclick="fiturBelumTersedia('Scan')" title="Scan (belum tersedia)">
+      <img src="https://img.icons8.com/ios-filled/50/qr-code--v1.png" />
+      <div>Scan</div>
+    </div>
+    <div class="fitur" onclick="openModal('modalKirim')" title="Kirim saldo ke akun lain">
+      <img src="https://img.icons8.com/ios-filled/50/money-transfer.png" />
+      <div>Kirim</div>
+    </div>
+    <div class="fitur" onclick="openModal('modalTerima')" title="Terima saldo masuk">
+      <img src="https://img.icons8.com/ios-filled/50/request-money.png" />
+      <div>Terima</div>
+    </div>
+    <div class="fitur" onclick="fiturBelumTersedia('Isi')" title="Isi (belum tersedia)">
+      <img src="https://img.icons8.com/ios-filled/50/wallet-app.png" />
+      <div>Isi</div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast"></div>
+
+  <script>
+    // Variabel global
+    let saldo = 0;
+    let hidden = false;
+    let history = [];
+    let currentUser = null; // password user yang sedang login
+    let pendingTransfers = {}; // saldo masuk yang belum diterima, per user
+
+    // Elemen DOM
+    const saldoText = document.getElementById('saldoText');
+    const eyeIcon = document.getElementById('eyeIcon');
+    const historyList = document.getElementById('historyList');
+    const loginScreen = document.getElementById('loginScreen');
+    const app = document.getElementById('app');
+    const loginPassword = document.getElementById('loginPassword');
+    const btnLogin = document.getElementById('btnLogin');
+    const btnRegister = document.getElementById('btnRegister');
+    const loginMsg = document.getElementById('loginMsg');
+    const toast = document.getElementById('toast');
+
+    // Fungsi format Rupiah
+    function formatRupiah(num) {
+      return "Rp" + num.toLocaleString("id-ID");
+    }
+
+    // Update tampilan saldo
+    function updateSaldoDisplay() {
+      saldoText.textContent = hidden ? "••••••" : formatRupiah(saldo);
+    }
+
+    // Toggle sembunyikan/ tampilkan saldo
+    function toggleSaldo() {
+      hidden = !hidden;
+      eyeIcon.src = hidden
+        ? "https://img.icons8.com/ios-glyphs/30/000000/closed-eye.png"
+        : "https://img.icons8.com/ios-glyphs/30/000000/visible--v1.png";
+      updateSaldoDisplay();
+    }
+
+    // Simpan data saldo dan history per user ke localStorage
+    function simpanData() {
+      if (!currentUser) return;
+      localStorage.setItem('dompetSaldo_' + currentUser, saldo);
+      localStorage.setItem('dompetHistory_' + currentUser, JSON.stringify(history));
+      localStorage.setItem('dompetTransfers_' + currentUser, JSON.stringify(pendingTransfers[currentUser] || []));
+    }
+
+    // Load data saldo dan history per user dari localStorage
+    function loadData() {
+      if (!currentUser) return;
+      const savedSaldo = localStorage.getItem('dompetSaldo_' + currentUser);
+      const savedHistory = localStorage.getItem('dompetHistory_' + currentUser);
+      const savedTransfers = localStorage.getItem('dompetTransfers_' + currentUser);
+
+      saldo = savedSaldo ? parseInt(savedSaldo) : 0;
+      history = savedHistory ? JSON.parse(savedHistory) : [];
+      pendingTransfers[currentUser] = savedTransfers ? JSON.parse(savedTransfers) : [];
+
+      updateSaldoDisplay();
+      renderHistory();
+    }
+
+    // Render riwayat transaksi
+    function renderHistory() {
+      if (history.length === 0) {
+        historyList.innerHTML = `<div style="color: #999;">Belum ada transaksi</div>`;
+        return;
+      }
+      historyList.innerHTML = '';
+      history.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'history-item' + (item.amount < 0 ? ' negative' : '');
+        div.innerHTML = `<span>${item.type}</span><span>${formatRupiah(item.amount)}</span>`;
+        historyList.appendChild(div);
+      });
+    }
+
+    // Tambah saldo
+    function tambahSaldo() {
+      const amount = parseInt(document.getElementById('amountInput').value);
+      if (!amount || amount <= 0) {
+        showToast("Masukkan nominal valid");
+        return;
+      }
+      saldo += amount;
+      history.push({ type: 'Tambah', amount: amount });
+      simpanData();
+      updateSaldoDisplay();
+      renderHistory();
+      document.getElementById('amountInput').value = '';
+      showToast("Saldo berhasil ditambah");
+    }
+
+    // Kurangi saldo
+    function kurangiSaldo() {
+      const amount = parseInt(document.getElementById('amountInput').value);
+      if (!amount || amount <= 0) {
+        showToast("Masukkan nominal valid");
+        return;
+      }
+      if (amount > saldo) {
+        showToast("Saldo tidak cukup");
+        return;
+      }
+      saldo -= amount;
+      history.push({ type: 'Kurangi', amount: -amount });
+      simpanData();
+      updateSaldoDisplay();
+      renderHistory();
+      document.getElementById('amountInput').value = '';
+      showToast("Saldo berhasil dikurangi");
+    }
+
+    // Hapus riwayat
+    function hapusRiwayat() {
+      if (!confirm("Yakin ingin hapus riwayat transaksi?")) return;
+      history = [];
+      simpanData();
+      renderHistory();
+      showToast("Riwayat transaksi dihapus");
+    }
+
+    // Tampilkan toast
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.style.opacity = 1;
+      setTimeout(() => {
+        toast.style.opacity = 0;
+      }, 2000);
+    }
+
+    // Fitur belum tersedia
+    function fiturBelumTersedia(nama) {
+      showToast(`Fitur "${nama}" belum tersedia`);
+    }
+
+    // Login handler
+    btnLogin.addEventListener('click', () => {
+      const pwd = loginPassword.value.trim();
+      if (!pwd) {
+        loginMsg.textContent = "Password tidak boleh kosong";
+        return;
+      }
+      // Cek apakah akun dengan password ini ada
+      if (localStorage.getItem('dompetSaldo_' + pwd) !== null) {
+        currentUser = pwd;
+        loginMsg.textContent = "";
+        loginScreen.classList.add('hidden');
+        app.classList.remove('hidden');
+        loadData();
+      } else {
+        loginMsg.textContent = "Akun tidak ditemukan, silakan buat akun baru jika belum punya";
+      }
+    });
+
+    // Register handler (buat akun baru)
+    btnRegister.addEventListener('click', () => {
+      const pwd = loginPassword.value.trim();
+      if (!pwd) {
+        loginMsg.textContent = "Password tidak boleh kosong";
+        return;
+      }
+      if (localStorage.getItem('dompetSaldo_' + pwd) !== null) {
+        loginMsg.textContent = "Password sudah digunakan, coba password lain";
+        return;
+      }
+      // Buat akun baru dengan saldo 0 dan riwayat kosong
+      currentUser = pwd;
+      saldo = 0;
+      history = [];
+      pendingTransfers[currentUser] = [];
+      simpanData();
+      loginMsg.textContent = "";
+      loginScreen.classList.add('hidden');
+      app.classList.remove('hidden');
+      updateSaldoDisplay();
+      renderHistory();
+      showToast("Akun baru berhasil dibuat");
+    });
+
+    // Modal fungsi
+    function openModal(id) {
+      if (!currentUser) {
+        showToast("Harap login dulu");
+        return;
+      }
+      if (id === 'modalTerima') {
+        renderPendingTransfers();
+      }
+      document.getElementById(id).classList.remove('hidden');
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+      clearModalMessages();
+    }
+    function clearModalMessages() {
+      document.getElementById('kirimMsg').textContent = "";
+    }
+
+    // Kirim saldo
+    document.getElementById('btnKirimSaldo').addEventListener('click', () => {
+      const tujuan = document.getElementById('kirimUsername').value.trim();
+      const nominal = parseInt(document.getElementById('kirimAmount').value);
+      if (!tujuan || !nominal || nominal <= 0) {
+        document.getElementById('kirimMsg').textContent = "Masukkan data valid";
+        return;
+      }
+      if (tujuan === currentUser) {
+        document.getElementById('kirimMsg').textContent = "Tidak bisa kirim ke akun sendiri";
+        return;
+      }
+      if (nominal > saldo) {
+        document.getElementById('kirimMsg').textContent = "Saldo tidak cukup";
+        return;
+    }
+    
+      // Cek apakah akun tujuan ada
+      if (localStorage.getItem('dompetSaldo_' + tujuan) === null) {
+        document.getElementById('kirimMsg').textContent = "Akun tujuan tidak ditemukan";
+        return;
+      }
+      // Kurangi saldo pengirim
+      saldo -= nominal;
+      history.push({ type: `Kirim ke [${tujuan}]`, amount: -nominal });
+      simpanData();
+      updateSaldoDisplay();
+      renderHistory();
+
+      // Tambah ke saldo masuk penerima, tapi belum diterima
+      let penerimaPending = JSON.parse(localStorage.getItem('dompetTransfers_' + tujuan));
+      if (!Array.isArray(penerimaPending)) penerimaPending = [];
+      penerimaPending.push({ from: currentUser, amount: nominal, date: new Date().toISOString() });
+      localStorage.setItem('dompetTransfers_' + tujuan, JSON.stringify(penerimaPending));
+
+      document.getElementById('kirimUsername').value = "";
+      document.getElementById('kirimAmount').value = "";
+      document.getElementById('kirimMsg').textContent = "";
+      closeModal('modalKirim');
+      showToast(`Berhasil kirim ${formatRupiah(nominal)} ke akun "${tujuan}"`);
+    });
+
+    // Render daftar saldo masuk yang belum diterima
+    function renderPendingTransfers() {
+      const listDiv = document.getElementById('listSaldoMasuk');
+      listDiv.innerHTML = '';
+      let pending = pendingTransfers[currentUser] || [];
+      if (pending.length === 0) {
+        listDiv.innerHTML = '<div style="color:#999; font-size:14px;">Tidak ada saldo masuk</div>';
+        return;
+      }
+      pending.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'transfer-item';
+        div.innerHTML = `
+          <span>Dari: <b>${item.from}</b></span>
+          <span>${formatRupiah(item.amount)}</span>
+          <button style="background:#dc2626; color:#fff; border:none; border-radius:6px; cursor:pointer;" onclick="terimaSaldo(${idx})">Terima</button>
+        `;
+        listDiv.appendChild(div);
+      });
+    }
+
+    // Terima saldo masuk
+    function terimaSaldo(idx) {
+      let pending = pendingTransfers[currentUser] || [];
+      if (idx < 0 || idx >= pending.length) return;
+      const transfer = pending[idx];
+
+      saldo += transfer.amount;
+      history.push({ type: `Terima dari [${transfer.from}]`, amount: transfer.amount });
+      pending.splice(idx, 1);
+      pendingTransfers[currentUser] = pending;
+      simpanData();
+      updateSaldoDisplay();
+      renderHistory();
+      renderPendingTransfers();
+      showToast(`Berhasil terima ${formatRupiah(transfer.amount)} dari akun "${transfer.from}"`);
+    }
+
+    // Saat mulai aplikasi, fokus ke password login
+    loginPassword.focus();
+  </script>
+</body>
+</html>
